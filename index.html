@@ -71,6 +71,16 @@
       setEventListener(mediaConnection);
     });
 
+    peer.on('error', err => {
+      alert(err.message);
+    });
+
+    peer.on('close', () => {
+      alert('通信が切断しました。');
+    });
+
+    
+
   </script>
 </body>
 </html>
