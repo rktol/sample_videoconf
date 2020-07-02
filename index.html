@@ -9,6 +9,9 @@
 <body>
   <video id="my-video" width="400px" autoplay muted playsinline></video>
   <p id="my-id"></p>
+  <textarea id="their-id"></textarea>
+  <button id="make-call">発信</button>
+  <video id="their-video" width="400px" autoplay muted playsinline></video>
 
 
 
@@ -31,13 +34,41 @@
       return;
     });
 
+    // Peerの作成
+
     const peer = new Peer({
       key: '05391f01-b3c5-41b4-99d7-e565dcbc1003',
       debug: 3
     });
 
+    // PeerIDの取得
     peer.on('open', () => {
       document.getElementById('my-id').textContent = peer.id;
+    });
+
+    // 発信処理
+
+    document.getElementById('make-call').onclick = () => {
+      const theirID = document.getElementById('their-id').value;
+      const mediaConnection = peer.call(theirID, localStream);
+      setEventListener(mediaConnection);
+    };
+
+    //イベントリスナを設置する関数
+
+    const setEventListener = mediaConnection => {
+      mediaConnection.on('stream', stream => {
+        // video要素にカメラ映像をセットして再生
+        const videoElm = document.getElementById('their-video')
+        videoElm.srcObject = stream;
+        videoElm.play();
+      });
+    }
+
+    //着信
+    peer.on('call', mediaConnection => {
+      mediaConnection.answer(localStream);
+      setEventListener(mediaConnection);
     });
 
   </script>
